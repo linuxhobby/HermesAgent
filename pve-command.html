@@ -1,0 +1,357 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>PVE Commands Reference</title>
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: #f6f8fa; color: #1f2328; padding: 2rem 1rem; }
+  .container { max-width: 860px; margin: 0 auto; }
+  h1 { font-size: 24px; font-weight: 600; margin-bottom: 0.25rem; }
+  .subtitle { font-size: 16px; color: #656d76; margin-bottom: 1.5rem; }
+  .search-bar { display: flex; align-items: center; gap: 8px; background: #fff; border: 1px solid #d0d7de; border-radius: 8px; padding: 8px 12px; margin-bottom: 1.5rem; }
+  .search-bar input { border: none; outline: none; font-size: 16px; color: #1f2328; width: 100%; background: transparent; font-family: 'SFMono-Regular', Consolas, monospace; }
+  .search-bar input::placeholder { color: #8c959f; }
+  .section { margin-bottom: 1.5rem; }
+  .section-title { font-size: 13px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.08em; color: #656d76; margin-bottom: 8px; }
+  .cmd-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 6px; }
+  .cmd-card { display: flex; align-items: flex-start; gap: 10px; background: #fff; border: 1px solid #d0d7de; border-radius: 8px; padding: 10px 12px; transition: border-color 0.15s; }
+  .cmd-card:hover { border-color: #0969da; }
+  .cmd-name { font-size: 14px; font-weight: 600; color: #0969da; font-family: 'SFMono-Regular', Consolas, monospace; min-width: 120px; flex-shrink: 0; padding-top: 1px; }
+  .cmd-desc { font-size: 14px; color: #656d76; line-height: 1.4; }
+  .no-result { font-size: 14px; color: #8c959f; padding: 1rem 0; }
+  footer { margin-top: 2.5rem; padding-top: 1.25rem; border-top: 1px solid #d0d7de; display: flex; flex-wrap: wrap; justify-content: space-between; align-items: flex-start; gap: 0.75rem; font-size: 13px; color: #656d76; }
+  footer a { color: #0969da; text-decoration: none; }
+  footer a:hover { text-decoration: underline; }
+  footer .footer-left { display: flex; flex-direction: column; gap: 4px; }
+  footer .footer-right { display: flex; flex-direction: column; align-items: flex-end; gap: 4px; }
+  @media (prefers-color-scheme: dark) {
+    body { background: #0d1117; color: #e6edf3; }
+    .search-bar, .cmd-card { background: #161b22; border-color: #30363d; }
+    .cmd-card:hover { border-color: #58a6ff; }
+    .cmd-name { color: #58a6ff; }
+    .cmd-desc, .subtitle { color: #8b949e; }
+    .section-title { color: #8b949e; }
+    .search-bar input { color: #e6edf3; }
+    .search-bar input::placeholder { color: #484f58; }
+    footer { border-top-color: #30363d; }
+    footer a { color: #58a6ff; }
+  }
+</style>
+</head>
+<body>
+<div class="container">
+  <h1>Proxmox VE Commands</h1>
+  <p class="subtitle">PVE 常用命令速查，支持搜索过滤</p>
+  <div class="search-bar">
+    <svg width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" style="color:#8c959f;flex-shrink:0"><circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/></svg>
+    <input type="text" placeholder="搜索命令..." id="search" oninput="filter()" />
+  </div>
+  <div id="content"></div>
+  <footer>
+    <div class="footer-left">
+      <span>© 2026 <a href="https://github.com/MARCO.CHAN" target="_blank">MARCO.CHAN</a></span>
+      <span>最后更新：2026 年 7 月</span>
+    </div>
+    <div class="footer-right">
+      <span><a href="https://github.com/linuxhobby/ProxmoxVEDocumentation" target="_blank">GitHub 仓库</a></span>
+      <span><a href="https://pve.proxmox.com/pve-docs/" target="_blank">PVE 官方文档</a></span>
+    </div>
+  </footer>
+</div>
+<script>
+const data = [
+  { cat: "虚拟机管理 (qm)", items: [
+    { cmd: "qm list", desc: "列出所有虚拟机" },
+    { cmd: "qm status <vmid>", desc: "查看虚拟机状态" },
+    { cmd: "qm start <vmid>", desc: "启动虚拟机" },
+    { cmd: "qm stop <vmid>", desc: "停止虚拟机" },
+    { cmd: "qm shutdown <vmid>", desc: "正常关机虚拟机" },
+    { cmd: "qm reboot <vmid>", desc: "重启虚拟机" },
+    { cmd: "qm suspend <vmid>", desc: "暂停虚拟机" },
+    { cmd: "qm resume <vmid>", desc: "恢复暂停的虚拟机" },
+    { cmd: "qm destroy <vmid>", desc: "删除虚拟机及其磁盘" },
+    { cmd: "qm create <vmid>", desc: "创建新虚拟机" },
+    { cmd: "qm clone <vmid> <newid>", desc: "克隆虚拟机" },
+    { cmd: "qm migrate <vmid> <target>", desc: "迁移虚拟机到目标节点" },
+    { cmd: "qm backup <vmid>", desc: "备份虚拟机" },
+    { cmd: "qm restore <vmid> <archive>", desc: "从备份恢复虚拟机" },
+    { cmd: "qm resize <vmid> <disk> <size>", desc: "调整虚拟机磁盘大小" },
+    { cmd: "qm set <vmid> --net0 ...", desc: "修改虚拟机配置" },
+    { cmd: "qm config <vmid>", desc: "查看虚拟机配置" },
+    { cmd: "qm monitor <vmid>", desc: "进入 QEMU 监视器交互界面" },
+    { cmd: "qm sendkey <vmid> <key>", desc: "发送按键到虚拟机" },
+    { cmd: "qm vncproxy <vmid>", desc: "启动 VNC 代理连接" },
+    { cmd: "qm terminal <vmid>", desc: "打开串行终端" },
+    { cmd: "qm importdisk <vmid> <file> <storage>", desc: "导入磁盘到虚拟机" },
+    { cmd: "qm showcmd <vmid>", desc: "显示 QEMU 启动命令" },
+    { cmd: "qm wait <vmid>", desc: "等待虚拟机停止" },
+    { cmd: "qm unlock <vmid>", desc: "解锁虚拟机配置锁" },
+    { cmd: "qm rescan", desc: "重新扫描存储中的磁盘" },
+    { cmd: "qm guest cmd <vmid> ...", desc: "执行虚拟机内部命令 (需 QEMU Agent)" },
+    { cmd: "qm guest fsfreeze <vmid>", desc: "冻结虚拟机文件系统" },
+    { cmd: "qm guest fsfreezethaw <vmid>", desc: "解冻虚拟机文件系统" },
+  ]},
+  { cat: "容器管理 (pct)", items: [
+    { cmd: "pct list", desc: "列出所有 LXC 容器" },
+    { cmd: "pct status <vmid>", desc: "查看容器状态" },
+    { cmd: "pct start <vmid>", desc: "启动容器" },
+    { cmd: "pct stop <vmid>", desc: "停止容器" },
+    { cmd: "pct shutdown <vmid>", desc: "正常关闭容器" },
+    { cmd: "pct reboot <vmid>", desc: "重启容器" },
+    { cmd: "pct destroy <vmid>", desc: "删除容器及其磁盘" },
+    { cmd: "pct create <vmid> <template>", desc: "从模板创建容器" },
+    { cmd: "pct clone <vmid> <newid>", desc: "克隆容器" },
+    { cmd: "pct migrate <vmid> <target>", desc: "迁移容器到目标节点" },
+    { cmd: "pct set <vmid> --memory 2048", desc: "修改容器内存" },
+    { cmd: "pct config <vmid>", desc: "查看容器配置" },
+    { cmd: "pct exec <vmid> <cmd>", desc: "在容器内执行命令" },
+    { cmd: "pct enter <vmid>", desc: "进入容器 shell" },
+    { cmd: "pct mount <vmid>", desc: "挂载容器根文件系统" },
+    { cmd: "pct unmount <vmid>", desc: "卸载容器根文件系统" },
+    { cmd: "pct push <vmid> <hostpath> <ctpath>", desc: "推送文件到容器" },
+    { cmd: "pct pull <vmid> <ctpath> <hostpath>", desc: "从容器拉取文件" },
+    { cmd: "pct rename <vmid> <newname>", desc: "重命名容器" },
+    { cmd: "pct template <vmid>", desc: "将容器转换为模板" },
+    { cmd: "pct fstrim <vmid>", desc: "对容器执行 fstrim 回收空间" },
+    { cmd: "pct unlock <vmid>", desc: "解锁容器配置锁" },
+    { cmd: "pct df <vmid>", desc: "显示容器磁盘使用情况" },
+  ]},
+  { cat: "存储管理 (pvesm)", items: [
+    { cmd: "pvesm status", desc: "显示存储状态" },
+    { cmd: "pvesm list", desc: "列出存储中的内容" },
+    { cmd: "pvesm add <type> <name>", desc: "添加存储" },
+    { cmd: "pvesm remove <name>", desc: "移除存储" },
+    { cmd: "pvesm set <name>", desc: "修改存储配置" },
+    { cmd: "pvesm alloc <storage> <vmid> <format> <size>", desc: "分配磁盘" },
+    { cmd: "pvesm free <storage> <volid>", desc: "释放磁盘" },
+    { cmd: "pvesm path <volid>", desc: "获取卷的文件路径" },
+    { cmd: "pvesm image <storage> <filename>", desc: "导入镜像" },
+    { cmd: "pvesm export <storage> <volid>", desc: "导出卷" },
+    { cmd: "pvesm extract <storage> <archive>", desc: "解压归档" },
+    { cmd: "pvesm prune <storage>", desc: "清理过期快照" },
+    { cmd: "pvesm garbagecollect <storage>", desc: "垃圾回收" },
+    { cmd: "pvesm sgcopy <src> <dst>", desc: "复制存储组" },
+    { cmd: "pvesm zfsscan", desc: "扫描 ZFS 存储池" },
+  ]},
+  { cat: "用户与权限管理 (pveum)", items: [
+    { cmd: "pveum user list", desc: "列出所有用户" },
+    { cmd: "pveum user add <userid>", desc: "添加用户" },
+    { cmd: "pveum user delete <userid>", desc: "删除用户" },
+    { cmd: "pveum user modify <userid>", desc: "修改用户属性" },
+    { cmd: "pveum group list", desc: "列出用户组" },
+    { cmd: "pveum group add <groupid>", desc: "添加用户组" },
+    { cmd: "pveum group delete <groupid>", desc: "删除用户组" },
+    { cmd: "pveum role list", desc: "列出角色" },
+    { cmd: "pveum role add <roleid>", desc: "添加角色" },
+    { cmd: "pveum role delete <roleid>", desc: "删除角色" },
+    { cmd: "pveum acl list", desc: "列出 ACL 规则" },
+    { cmd: "pveum acl modify", desc: "修改 ACL 规则" },
+    { cmd: "pveum acl delete", desc: "删除 ACL 规则" },
+    { cmd: "pveum realm list", desc: "列出认证域 (Realm)" },
+    { cmd: "pveum token list", desc: "列出 API Token" },
+  ]},
+  { cat: "网络管理", items: [
+    { cmd: "ip addr", desc: "查看网络接口和 IP 地址" },
+    { cmd: "ip link show", desc: "查看网络接口状态" },
+    { cmd: "ip route", desc: "查看路由表" },
+    { cmd: "brctl show", desc: "查看网桥信息" },
+    { cmd: "pveam update", desc: "更新 CT 模板列表" },
+    { cmd: "pveam available", desc: "查看可用 CT 模板" },
+    { cmd: "pveam list <storage>", desc: "列出存储中的模板" },
+    { cmd: "pveam download <storage> <template>", desc: "下载 CT 模板" },
+    { cmd: "pveam remove <storage> <template>", desc: "删除 CT 模板" },
+  ]},
+  { cat: "集群管理", items: [
+    { cmd: "pveversion", desc: "显示 PVE 版本" },
+    { cmd: "pvecm status", desc: "查看集群状态" },
+    { cmd: "pvecm nodes", desc: "列出集群节点" },
+    { cmd: "pvecm add <hostname>", desc: "添加节点到集群" },
+    { cmd: "pvecm delnode <nodename>", desc: "从集群删除节点" },
+    { cmd: "pvecm expected <number>", desc: "设置预期节点数" },
+    { cmd: "pvecm updatecerts", desc: "更新集群证书" },
+    { cmd: "pvecm mtunnel", desc: "创建迁移隧道" },
+    { cmd: "pvecm fingerprint <hostname>", desc: "获取远程节点指纹" },
+    { cmd: "pvecm keygen", desc: "生成集群密钥" },
+  ]},
+  { cat: "备份与恢复", items: [
+    { cmd: "vzdump <vmid> --storage <storage>", desc: "备份虚拟机/容器" },
+    { cmd: "vzdump --all --storage <storage>", desc: "备份所有虚拟机/容器" },
+    { cmd: "vzdump --list", desc: "列出备份" },
+    { cmd: "qmrestore <storage>:backup/<archive> <vmid>", desc: "从备份恢复虚拟机" },
+    { cmd: "pct restore <vmid> <template>", desc: "从模板恢复容器" },
+    { cmd: "qm dump <vmid>", desc: "导出虚拟机配置" },
+    { cmd: "vzdump --mode snapshot", desc: "使用快照模式备份" },
+    { cmd: "vzdump --mode suspend", desc: "使用暂停模式备份" },
+    { cmd: "vzdump --mode stop", desc: "使用停止模式备份" },
+    { cmd: "vzdump --compress zstd", desc: "使用 zstd 压缩备份" },
+    { cmd: "vzdump --storage <storage> --remove 0", desc: "保留旧备份不自动删除" },
+  ]},
+  { cat: "快照管理", items: [
+    { cmd: "qm listsnapshot <vmid>", desc: "列出虚拟机快照" },
+    { cmd: "qm snapshot <vmid> <name>", desc: "创建快照" },
+    { cmd: "qm rollback <vmid> <snapname>", desc: "回滚到快照" },
+    { cmd: "qm delsnapshot <vmid> <name>", desc: "删除快照" },
+    { cmd: "qm setsnapshot <vmid> <name>", desc: "设置当前快照" },
+    { cmd: "pct snapshots <vmid>", desc: "列出容器快照" },
+    { cmd: "pct snapshot <vmid> <name>", desc: "创建容器快照" },
+    { cmd: "pct rollback <vmid> <snapname>", desc: "回滚容器快照" },
+    { cmd: "pct delsnapshot <vmid> <name>", desc: "删除容器快照" },
+  ]},
+  { cat: "复制管理 (pvesr)", items: [
+    { cmd: "pvesr list", desc: "列出所有复制任务" },
+    { cmd: "pvesr create <id>", desc: "创建存储复制任务" },
+    { cmd: "pvesr delete <id>", desc: "删除复制任务" },
+    { cmd: "pvesr run <id>", desc: "立即执行复制任务" },
+    { cmd: "pvesr status", desc: "查看复制状态" },
+  ]},
+  { cat: "系统信息", items: [
+    { cmd: "pveversion --verbose", desc: "显示详细版本信息" },
+    { cmd: "pvesh get /nodes/<node>/status", desc: "获取节点状态" },
+    { cmd: "pvesh get /cluster/resources", desc: "获取集群资源" },
+    { cmd: "pvesh get /nodes/<node>/hardware/cpu", desc: "查看 CPU 信息" },
+    { cmd: "pvesh get /nodes/<node>/hardware/memory", desc: "查看内存信息" },
+    { cmd: "pvesh get /nodes/<node>/hardware/pci", desc: "查看 PCI 设备" },
+    { cmd: "pvesh get /nodes/<node>/hardware/usb", desc: "查看 USB 设备" },
+    { cmd: "pvesh get /nodes/<node>/network", desc: "查看网络配置" },
+    { cmd: "pvesh get /nodes/<node>/storage", desc: "查看存储配置" },
+    { cmd: "pvesh get /nodes/<node>/disks", desc: "查看磁盘列表" },
+    { cmd: "pvesh get /nodes/<node>/disks/smart", desc: "查看磁盘 SMART 信息" },
+    { cmd: "pvesh get /nodes/<node>/vms", desc: "查看节点上的虚拟机" },
+    { cmd: "pvesh get /nodes/<node>/lxc", desc: "查看节点上的容器" },
+  ]},
+  { cat: "高可用 (HA)", items: [
+    { cmd: "ha-manager status", desc: "查看 HA 状态" },
+    { cmd: "ha-manager add <sid> --target <node>", desc: "添加 HA 服务" },
+    { cmd: "ha-manager remove <sid>", desc: "移除 HA 服务" },
+    { cmd: "ha-manager set <sid> --state started", desc: "启动 HA 服务" },
+    { cmd: "ha-manager set <sid> --state stopped", desc: "停止 HA 服务" },
+    { cmd: "ha-manager set <sid> --state disabled", desc: "禁用 HA 服务" },
+    { cmd: "ha-manager migrate <sid> <target>", desc: "迁移 HA 服务" },
+    { cmd: "ha-manager cmigrate --node <node>", desc: "批量迁移节点上的 HA 服务" },
+    { cmd: "ha-manager crmstatus", desc: "查看 CRM 状态" },
+    { cmd: "ha-manager config", desc: "查看 HA 配置" },
+    { cmd: "ha-manager reload", desc: "重新加载 HA 配置" },
+  ]},
+  { cat: "数据中心配置", items: [
+    { cmd: "pvesh set /datacenter/ids/<user>", desc: "设置用户权限" },
+    { cmd: "pvesh create /datacenter/acl", desc: "创建 ACL 规则" },
+    { cmd: "pvesh set /datacenter/dc/options", desc: "修改数据中心选项" },
+    { cmd: "pvesh get /access/users", desc: "查看用户列表" },
+    { cmd: "pvesh create /access/users", desc: "创建用户" },
+    { cmd: "pvesh set /access/users/<user>", desc: "修改用户" },
+    { cmd: "pvesh delete /access/users/<user>", desc: "删除用户" },
+    { cmd: "pvesh get /access/groups", desc: "查看用户组" },
+    { cmd: "pvesh get /access/roles", desc: "查看角色列表" },
+    { cmd: "pvesh get /access/domains", desc: "查看认证域" },
+    { cmd: "pvesh get /storage", desc: "查看存储配置" },
+    { cmd: "pvesh get /pools", desc: "查看资源池" },
+    { cmd: "pvesh get /datacenter/replication", desc: "查看复制任务" },
+    { cmd: "pvesh create /datacenter/replication", desc: "创建复制任务" },
+  ]},
+  { cat: "防火墙", items: [
+    { cmd: "pve-firewall status", desc: "查看防火墙状态" },
+    { cmd: "pve-firewall start", desc: "启动防火墙" },
+    { cmd: "pve-firewall stop", desc: "停止防火墙" },
+    { cmd: "pve-firewall restart", desc: "重启防火墙" },
+    { cmd: "pve-firewall localnet", desc: "显示本地网络" },
+    { cmd: "pve-firewall compile", desc: "编译防火墙规则" },
+    { cmd: "iptables -L -n", desc: "查看 iptables 规则" },
+    { cmd: "ip6tables -L -n", desc: "查看 ip6tables 规则" },
+    { cmd: "nft list ruleset", desc: "查看 nftables 规则" },
+  ]},
+  { cat: "Ceph 管理 (pveceph)", items: [
+    { cmd: "pveceph status", desc: "查看 Ceph 集群状态" },
+    { cmd: "pveceph install", desc: "安装 Ceph 包" },
+    { cmd: "pveceph pool create <pool>", desc: "创建 Ceph 存储池" },
+    { cmd: "pveceph pool ls", desc: "列出 Ceph 存储池" },
+    { cmd: "pveceph pool destroy <pool>", desc: "删除 Ceph 存储池" },
+    { cmd: "pveceph fs create", desc: "创建 CephFS 文件系统" },
+    { cmd: "pveceph mgr create", desc: "创建 Ceph Manager" },
+    { cmd: "pveceph mon create", desc: "创建 Ceph Monitor" },
+  ]},
+  { cat: "ZFS 管理", items: [
+    { cmd: "zpool list", desc: "列出 ZFS 存储池" },
+    { cmd: "zpool status", desc: "查看 ZFS 存储池状态" },
+    { cmd: "zfs list", desc: "列出 ZFS 数据集" },
+    { cmd: "zpool create <name> <devices>", desc: "创建 ZFS 存储池" },
+    { cmd: "zpool destroy <name>", desc: "销毁 ZFS 存储池" },
+    { cmd: "zpool import <name>", desc: "导入 ZFS 存储池" },
+    { cmd: "zpool export <name>", desc: "导出 ZFS 存储池" },
+    { cmd: "zpool scrub <pool>", desc: "执行 ZFS 数据校验" },
+    { cmd: "zpool expand <pool>", desc: "扩展 ZFS 存储池" },
+    { cmd: "zpool add <pool> <device>", desc: "向存储池添加设备" },
+    { cmd: "zpool remove <pool> <device>", desc: "从存储池移除设备" },
+    { cmd: "zpool history <pool>", desc: "查看存储池操作历史" },
+    { cmd: "zfs create <pool>/<dataset>", desc: "创建 ZFS 数据集" },
+    { cmd: "zfs destroy <pool>/<dataset>", desc: "销毁 ZFS 数据集" },
+    { cmd: "zfs snapshot <pool>/<dataset>@<snap>", desc: "创建 ZFS 快照" },
+    { cmd: "zfs rollback <pool>/<dataset>@<snap>", desc: "回滚 ZFS 快照" },
+    { cmd: "zfs set <prop>=<val> <dataset>", desc: "设置 ZFS 属性" },
+    { cmd: "zfs get <prop> <dataset>", desc: "获取 ZFS 属性" },
+    { cmd: "zfs mount <dataset>", desc: "挂载 ZFS 数据集" },
+    { cmd: "zfs unmount <dataset>", desc: "卸载 ZFS 数据集" },
+    { cmd: "zfs rename <old> <new>", desc: "重命名 ZFS 数据集" },
+    { cmd: "zfs send <pool>/<dataset>@<snap> | zfs recv <dest>", desc: "复制 ZFS 数据集" },
+  ]},
+  { cat: "日志与调试", items: [
+    { cmd: "journalctl -u pveproxy", desc: "查看 PVE 代理日志" },
+    { cmd: "journalctl -u pvedaemon", desc: "查看 PVE 守护进程日志" },
+    { cmd: "journalctl -u pvestatd", desc: "查看 PVE 状态服务日志" },
+    { cmd: "journalctl -u pve-cluster", desc: "查看 PVE 集群日志" },
+    { cmd: "tail -f /var/log/pve/pveproxy/access.log", desc: "实时查看访问日志" },
+    { cmd: "tail -f /var/log/pve/pveproxy/error.log", desc: "实时查看错误日志" },
+    { cmd: "dmesg | tail -50", desc: "查看最近内核消息" },
+    { cmd: "lscpu", desc: "查看 CPU 信息" },
+    { cmd: "free -h", desc: "查看内存使用情况" },
+    { cmd: "df -h", desc: "查看磁盘使用情况" },
+    { cmd: "top", desc: "实时系统监控" },
+    { cmd: "htop", desc: "增强版系统监控" },
+  ]},
+  { cat: "常用服务", items: [
+    { cmd: "systemctl restart pveproxy", desc: "重启 PVE Web 代理" },
+    { cmd: "systemctl restart pvedaemon", desc: "重启 PVE 守护进程" },
+    { cmd: "systemctl restart pve-cluster", desc: "重启 PVE 集群服务" },
+    { cmd: "systemctl restart pvestatd", desc: "重启 PVE 状态服务" },
+    { cmd: "systemctl restart pve-ha-crm", desc: "重启 HA CRM 服务" },
+    { cmd: "systemctl restart pve-ha-lrm", desc: "重启 HA LRM 服务" },
+    { cmd: "systemctl restart ssh", desc: "重启 SSH 服务" },
+    { cmd: "systemctl status pveproxy", desc: "查看 PVE 代理状态" },
+    { cmd: "systemctl status pvedaemon", desc: "查看 PVE 守护进程状态" },
+    { cmd: "systemctl list-units --type=service | grep pve", desc: "列出所有 PVE 服务" },
+    { cmd: "apt update && apt upgrade", desc: "更新系统软件包" },
+    { cmd: "apt autoremove", desc: "清理无用软件包" },
+    { cmd: "pveupdate", desc: "更新 PVE 软件源" },
+  ]},
+  { cat: "其他工具", items: [
+    { cmd: "pveperf", desc: "主机性能测试" },
+    { cmd: "pvesubscription", desc: "管理节点订阅密钥" },
+    { cmd: "pveupgrade", desc: "检查 PVE 可用升级" },
+  ]},
+];
+
+function render(q) {
+  const container = document.getElementById('content');
+  q = (q || '').toLowerCase().trim();
+  let html = '';
+  let any = false;
+  data.forEach(section => {
+    const items = q ? section.items.filter(i => i.cmd.toLowerCase().includes(q) || i.desc.toLowerCase().includes(q)) : section.items;
+    if (!items.length) return;
+    any = true;
+    html += `<div class="section"><div class="section-title">${section.cat}</div><div class="cmd-grid">`;
+    items.forEach(i => {
+      html += `<div class="cmd-card"><span class="cmd-name">${i.cmd}</span><span class="cmd-desc">${i.desc}</span></div>`;
+    });
+    html += `</div></div>`;
+  });
+  if (!any) html = `<div class="no-result">未找到匹配命令</div>`;
+  container.innerHTML = html;
+}
+
+function filter() { render(document.getElementById('search').value); }
+render('');
+</script>
+</body>
+</html>
