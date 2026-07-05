@@ -25,6 +25,10 @@
   .cmd-desc { font-size: 13.5px; color: #656d76; line-height: 1.35; flex: 1; }
   .no-result { font-size: 14px; color: #8c959f; padding: 1rem 0; }
   .note { font-size: 12px; color: #8c959f; margin-top: 4px; }
+  .info-box { background: #fff; border: 1px solid #d0d7de; border-left: 3px solid #0969da; border-radius: 7px; padding: 10px 14px; }
+  .info-item { display: flex; gap: 10px; font-size: 13px; padding: 3px 0; align-items: flex-start; }
+  .info-item .info-label { font-weight: 600; color: #1f2328; min-width: 78px; flex-shrink: 0; font-family: 'SFMono-Regular', Consolas, ui-monospace, monospace; font-size: 12.5px; }
+  .info-item .info-text { color: #656d76; flex: 1; line-height: 1.4; }
   .copy-toast { position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%); background: #1f2328; color: #fff; padding: 6px 14px; border-radius: 999px; font-size: 13px; opacity: 0; transition: opacity 0.2s; pointer-events: none; z-index: 9999; }
   .copy-toast.show { opacity: 1; }
   footer { margin-top: 2rem; padding-top: 1rem; border-top: 1px solid #d0d7de; display: flex; flex-wrap: wrap; justify-content: space-between; align-items: flex-start; gap: 0.6rem; font-size: 12px; color: #656d76; }
@@ -43,6 +47,9 @@
     .section-title { color: #8b949e; }
     .search-bar input { color: #e6edf3; }
     .search-bar input::placeholder { color: #484f58; }
+    .info-box { background: #161b22; border-color: #30363d; border-left-color: #58a6ff; }
+    .info-item .info-label { color: #e6edf3; }
+    .info-item .info-text { color: #8b949e; }
     footer { border-top-color: #30363d; }
     footer a { color: #58a6ff; }
     .copy-toast { background: #30363d; }
@@ -52,21 +59,21 @@
 <body>
 <div class="container">
   <h1>Hermes Agent 指令速查</h1>
-  <p class="subtitle">常用 CLI 命令 + 对话内斜杠命令 · 点击命令一键复制 · 支持实时搜索过滤</p>
+  <p class="subtitle">CLI 命令 + 完整斜杠命令清单 · 点击命令一键复制 · 实时搜索过滤</p>
 
   <div class="search-bar">
     <svg width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5" style="color:#8c959f;flex-shrink:0"><circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/></svg>
     <input type="text" placeholder="搜索命令或描述（例如 model、sessions、/help）..." id="search" oninput="filter()" />
   </div>
 
-  <div class="legend">💡 提示：点击蓝色命令文本即可复制到剪贴板。推荐添加到 shell alias 提升效率。</div>
+  <div class="legend">💡 提示：点击蓝色命令即可复制。CLI 命令推荐加入 shell alias；斜杠命令在对话中输入。按 <span>/</span> 聚焦搜索框。</div>
 
   <div id="content"></div>
 
   <footer>
     <div class="footer-left">
       <span>© 2026 · 基于本地安装与官方指南整理</span>
-      <span>最后更新：2026-06</span>
+      <span>最后更新：2026 年 7 月</span>
     </div>
     <div class="footer-right">
       <span><a href="https://github.com/NousResearch/hermes-agent" target="_blank">官方 GitHub</a> · <a href="https://hermes-agent.nousresearch.com/docs/" target="_blank">官方文档</a></span>
@@ -203,31 +210,117 @@ const data = [
     { cmd: "hermes insights 7", desc: "查看最近 7 天使用洞察与 token 统计" },
   ]},
 
-  // ========== 对话内斜杠命令 (/xxx) ==========
-  { cat: "💬 对话内斜杠命令 (/xxx)", items: [
-    { cmd: "/help", desc: "显示所有可用斜杠命令（支持 /help <cmd> 详情）" },
-    { cmd: "/model [model]", desc: "切换当前会话模型（支持 --global 改默认）" },
-    { cmd: "/memory add 关键事实", desc: "添加全局记忆（永久保存）" },
-    { cmd: "/memory", desc: "查看/编辑/搜索记忆" },
-    { cmd: "/skills", desc: "管理当前会话加载的技能" },
-    { cmd: "/clear", desc: "清除当前对话上下文（全新开始）" },
-    { cmd: "/compact [here N]", desc: "压缩上下文（释放 token，可保留最近 N 轮）" },
-    { cmd: "/export", desc: "导出当前对话（Markdown / JSON / 文本）" },
-    { cmd: "/new [name]", desc: "开启全新会话（别名 /reset）" },
-    { cmd: "/retry", desc: "重试上一条用户消息" },
-    { cmd: "/undo [N]", desc: "撤销最近 N 轮用户输入并重提示" },
-    { cmd: "/rollback [num]", desc: "列出或恢复文件系统检查点" },
-    { cmd: "/private", desc: "本次对话进入隐私模式（不保存）" },
-    { cmd: "/yolo", desc: "切换 YOLO 模式（跳过危险审批）" },
-    { cmd: "/status", desc: "显示当前会话信息" },
-    { cmd: "/goal 长期目标描述", desc: "设置跨轮持久目标（直到完成）" },
-    { cmd: "/subgoal 额外条件", desc: "为当前目标添加子条件" },
-    { cmd: "/system 指令", desc: "注入系统消息（纠正 Agent 行为）" },
-    { cmd: "/temp claude-sonnet-4", desc: "仅下一条消息临时切换模型" },
-    { cmd: "/version", desc: "显示 Hermes 版本" },
-    { cmd: "/update", desc: "触发更新" },
-    { cmd: "/debug", desc: "上传调试报告" },
-    { cmd: "/quit [--delete]", desc: "退出 CLI（--delete 同时删历史）" },
+  // ========== 斜杠命令 · 标签说明 ==========
+  { cat: "🏷️ 斜杠命令 · 标签说明 (Surface Tags)", type: "info", items: [
+    { label: "CLI", desc: "仅限终端（Terminal only）" },
+    { label: "CHAT", desc: "仅限聊天/消息界面（Messaging only）" },
+    { label: "CFG", desc: "受配置限制 / 条件触发（Config-gated / Conditional）" },
+    { label: "无标签", desc: "同时适用于 CLI + Chat" },
+  ]},
+
+  // ========== 会话与流程管理 ==========
+  { cat: "🔄 会话与流程管理 (SESSION / FLOW)", items: [
+    { cmd: "/start", desc: "平台启动 Ping 测试" },
+    { cmd: "/new", desc: "开启新会话（同 /reset）" },
+    { cmd: "/topic", desc: "Telegram 私聊话题管理" },
+    { cmd: "/clear", desc: "清屏并开启新会话" },
+    { cmd: "/redraw", desc: "强制重绘 UI 界面" },
+    { cmd: "/history", desc: "显示历史对话记录" },
+    { cmd: "/save", desc: "保存当前对话" },
+    { cmd: "/retry", desc: "重新发送上一条消息" },
+    { cmd: "/prompt", desc: "在 $EDITOR 中撰写提示词（同 /compose）" },
+    { cmd: "/undo", desc: "回退/删除上一步交互" },
+    { cmd: "/title", desc: "设置会话标题" },
+    { cmd: "/handoff", desc: "将会话转移至聊天应用" },
+    { cmd: "/branch", desc: "分叉/克隆当前会话（同 /fork）" },
+    { cmd: "/compress", desc: "压缩并总结上下文（同 /compact）" },
+    { cmd: "/rollback", desc: "列出或恢复检查点（回滚）" },
+    { cmd: "/snapshot", desc: "状态快照（同 /snap）" },
+    { cmd: "/stop", desc: "强行终止/中断正在运行的任务" },
+    { cmd: "/approve", desc: "允许/批准等待中的命令" },
+    { cmd: "/deny", desc: "拒绝等待中的命令" },
+    { cmd: "/background", desc: "独立的后台运行（同 /bg 或 /btw）" },
+    { cmd: "/agents", desc: "查看活跃的智能体/任务（同 /tasks）" },
+    { cmd: "/journey", desc: "学习时间线/历程（同 /learning）" },
+    { cmd: "/queue", desc: "将下一个提示词加入队列（同 /q）" },
+    { cmd: "/steer", desc: "在运行途中进行微调/干预引导" },
+    { cmd: "/goal", desc: "持久化目标循环" },
+    { cmd: "/moa", desc: "一键调用混合智能体（Mixture of Agents）" },
+    { cmd: "/subgoal", desc: "添加子目标标准" },
+    { cmd: "/status", desc: "查看当前会话/模型/上下文状态" },
+    { cmd: "/sethome", desc: "设置交付/输出主目录（同 /set-home）" },
+    { cmd: "/resume", desc: "恢复指定的命名会话" },
+    { cmd: "/sessions", desc: "浏览所有会话或进行界面切换（TUI /switch）" },
+  ]},
+
+  // ========== 配置管理 ==========
+  { cat: "⚙️ 配置管理 (CONFIG)", items: [
+    { cmd: "/config", desc: "显示当前配置" },
+    { cmd: "/model", desc: "切换模型或供应商" },
+    { cmd: "/codex-runtime", desc: "Codex 应用服务器（同 /codex_runtime）" },
+    { cmd: "/personality", desc: "设置智能体的性格/人设" },
+    { cmd: "/statusbar", desc: "切换状态栏显示（同 /sb）" },
+    { cmd: "/timestamps", desc: "显示消息时间戳（同 /ts）" },
+    { cmd: "/verbose", desc: "开启工具运行的详细进度模式" },
+    { cmd: "/footer", desc: "页脚元数据设置" },
+    { cmd: "/yolo", desc: "开启 YOLO 模式（跳过所有人工批准直接运行）" },
+    { cmd: "/reasoning", desc: "推理控制（调整思考工作量与显示）" },
+    { cmd: "/fast", desc: "开启高优先级/快速模式" },
+    { cmd: "/skin", desc: "更换显示主题" },
+    { cmd: "/indicator", desc: "修改忙碌状态指示器的样式" },
+    { cmd: "/voice", desc: "语音/文本转语音（TTS）模式" },
+    { cmd: "/busy", desc: "在运行中途输入行为" },
+  ]},
+
+  // ========== 工具与技能 ==========
+  { cat: "🧰 工具与技能 (TOOLS / SKILLS)", items: [
+    { cmd: "/tools", desc: "启用或禁用工具" },
+    { cmd: "/toolsets", desc: "列出所有工具集" },
+    { cmd: "/skills", desc: "管理或审批技能" },
+    { cmd: "/memory", desc: "审批写入内存的数据" },
+    { cmd: "/bundles", desc: "技能包别名管理" },
+    { cmd: "/pet", desc: "Petdex 吉祥物管理" },
+    { cmd: "/hatch", desc: "孵化/生成宠物（同 /generate-pet）" },
+    { cmd: "/learn", desc: "创建可复用的技能" },
+    { cmd: "/cron", desc: "定时任务（Cron 任务）" },
+    { cmd: "/suggestions", desc: "自动化建议与构想（同 /suggest）" },
+    { cmd: "/blueprint", desc: "自动化模板/蓝图（同 /bp）" },
+    { cmd: "/curator", desc: "技能维护与馆藏管理" },
+    { cmd: "/kanban", desc: "团队协作看板" },
+    { cmd: "/reload", desc: "重新加载 .env 环境变量文件" },
+    { cmd: "/reload-mcp", desc: "重新加载 MCP（同 /reload_mcp）" },
+    { cmd: "/reload-skills", desc: "重新扫描/重新加载技能（同 /reload_skills）" },
+    { cmd: "/browser", desc: "挂载 CDP 浏览器（Chrome 开发者协议）" },
+    { cmd: "/plugins", desc: "查看插件状态" },
+  ]},
+
+  // ========== 信息与退出 ==========
+  { cat: "ℹ️ 信息与退出 (INFO / EXIT)", items: [
+    { cmd: "/whoami", desc: "查看当前斜杠命令的访问权限级别" },
+    { cmd: "/profile", desc: "查看当前激活的配置文件/主页位置" },
+    { cmd: "/commands", desc: "分页显示所有命令列表" },
+    { cmd: "/help", desc: "获取命令帮助信息" },
+    { cmd: "/restart", desc: "重启网关" },
+    { cmd: "/usage", desc: "查看使用量统计（Token、花费、额度限制）" },
+    { cmd: "/credits", desc: "查看 Nous 积分/余额" },
+    { cmd: "/billing", desc: "终端计费信息" },
+    { cmd: "/insights", desc: "使用情况分析与洞察" },
+    { cmd: "/platforms", desc: "查看网关/平台状态（同 /gateway）" },
+    { cmd: "/platform", desc: "暂停或恢复适配器" },
+    { cmd: "/copy", desc: "复制助手的回复内容" },
+    { cmd: "/paste", desc: "从剪贴板粘贴图片" },
+    { cmd: "/image", desc: "附加图片路径" },
+    { cmd: "/update", desc: "升级/更新 Hermes 系统" },
+    { cmd: "/version", desc: "查看版本信息（同 /v）" },
+    { cmd: "/debug", desc: "上传调试/错误报告" },
+    { cmd: "/quit", desc: "退出终端（同 /exit）" },
+  ]},
+
+  // ========== 动态路由说明 ==========
+  { cat: "🔀 动态路由说明 (DYNAMIC ROUTES)", type: "info", items: [
+    { label: "技能命令", desc: "已安装的技能会自动暴露为 /<技能名> 的命令形式（例如 /plan）" },
+    { label: "自定义路由", desc: "技能包（Bundles）、插件（plugins）和快捷命令可添加环境特定的自定义路由" },
+    { label: "说明", desc: "上述列表未逐一列出动态命令，取决于你具体安装了什么以及如何配置" },
   ]},
 ];
 
@@ -260,17 +353,27 @@ function render(q) {
 
   data.forEach(section => {
     const items = q
-      ? section.items.filter(i => 
-          i.cmd.toLowerCase().includes(q) || 
-          i.desc.toLowerCase().includes(q)
+      ? section.items.filter(i =>
+          (i.cmd || i.label || '').toLowerCase().includes(q) ||
+          (i.desc || '').toLowerCase().includes(q)
         )
       : section.items;
     if (!items.length) return;
     any = true;
 
+    // 信息块（标签说明 / 动态路由）
+    if (section.type === 'info') {
+      html += `<div class="section"><div class="section-title">${section.cat}</div><div class="info-box">`;
+      items.forEach(i => {
+        html += `<div class="info-item"><span class="info-label">${i.label || ''}</span><span class="info-text">${i.desc}</span></div>`;
+      });
+      html += `</div></div>`;
+      return;
+    }
+
+    // 普通命令卡片
     html += `<div class="section"><div class="section-title">${section.cat}</div><div class="cmd-grid">`;
     items.forEach(i => {
-      const isSlash = i.cmd.startsWith('/');
       const displayCmd = i.cmd;
       html += `<div class="cmd-card" title="点击命令复制">
         <span class="cmd-name clickable" data-cmd="${displayCmd.replace(/"/g, '&quot;')}">${displayCmd}</span>
@@ -293,8 +396,8 @@ function render(q) {
   });
 }
 
-function filter() { 
-  render(document.getElementById('search').value); 
+function filter() {
+  render(document.getElementById('search').value);
 }
 
 render('');
