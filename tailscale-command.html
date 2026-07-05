@@ -51,8 +51,8 @@
   <div id="content"></div>
   <footer>
     <div class="footer-left">
-      <span>© 2025 <a href="https://github.com/linuxhobby" target="_blank">linuxhobby</a></span>
-      <span>最后更新：2025 年 4 月</span>
+      <span>© 2026 <a href="https://github.com/MARCO.CHAN" target="_blank">MARCO.CHAN</a></span>
+      <span>最后更新：2026 年 7 月</span>
     </div>
     <div class="footer-right">
       <span><a href="https://github.com/linuxhobby/ProxmoxVEDocumentation" target="_blank">GitHub 仓库</a></span>
@@ -66,6 +66,7 @@ const data = [
     { cmd: "up",      desc: "连接到 Tailscale，如需时进行登录" },
     { cmd: "down",    desc: "从 Tailscale 断开连接" },
     { cmd: "set",     desc: "更改指定的首选项" },
+    { cmd: "wait",    desc: "等待 Tailscale 资源变为可用" },
   ]},
   { cat: "账号", items: [
     { cmd: "login",   desc: "登录到 Tailscale 账户" },
@@ -73,31 +74,40 @@ const data = [
     { cmd: "switch",  desc: "切换到不同的 Tailscale 账户" },
   ]},
   { cat: "网络诊断", items: [
-    { cmd: "netcheck", desc: "显示本地网络条件分析" },
-    { cmd: "ping",     desc: "在 Tailscale 层 ping 主机，查看路由情况" },
-    { cmd: "status",   desc: "显示 tailscaled 及其连接的状态" },
-    { cmd: "ip",       desc: "显示 Tailscale IP 地址" },
+    { cmd: "netcheck",  desc: "显示本地网络条件分析" },
+    { cmd: "ping",      desc: "在 Tailscale 层 ping 主机，查看路由情况" },
+    { cmd: "status",    desc: "显示 tailscaled 及其连接的状态" },
+    { cmd: "ip",        desc: "显示 Tailscale IP 地址" },
+    { cmd: "whois",     desc: "获取与 Tailscale IP 关联的机器和用户信息" },
+    { cmd: "exit-node", desc: "获取 tailnet 中出口节点的信息" },
+    { cmd: "appc-routes", desc: "打印应用连接器 (App Connector) 的路由状态" },
   ]},
   { cat: "连接工具", items: [
     { cmd: "nc",      desc: "连接到主机上的端口，接入 stdin/stdout" },
     { cmd: "ssh",     desc: "SSH 到 Tailscale 机器" },
-    { cmd: "file",    desc: "发送或接收文件" },
+    { cmd: "file",    desc: "发送或接收文件 (Taildrop)" },
+    { cmd: "drive",   desc: "使用 Taildrive 与 tailnet 共享目录" },
   ]},
   { cat: "对外服务", items: [
     { cmd: "funnel",  desc: "在公网上暴露内容和本地服务器" },
     { cmd: "serve",   desc: "在 tailnet 内部提供内容和本地服务器" },
     { cmd: "cert",    desc: "获取 TLS 证书" },
+    { cmd: "dns",     desc: "访问 Tailscale DNS 设置" },
   ]},
   { cat: "系统管理", items: [
     { cmd: "configure", desc: "配置主机以启用更多 Tailscale 功能" },
     { cmd: "lock",      desc: "管理 tailnet 锁定" },
     { cmd: "update",    desc: "将 Tailscale 更新到最新或指定版本" },
     { cmd: "web",       desc: "运行用于控制 Tailscale 的 Web 服务器" },
+    { cmd: "metrics",   desc: "暴露和收集 Tailscale 客户端指标" },
+    { cmd: "syspolicy", desc: "列出、重新加载系统策略或检查错误" },
+    { cmd: "completion", desc: "为 Tailscale CLI 配置 Tab 自动补全" },
   ]},
   { cat: "其他", items: [
     { cmd: "version",   desc: "显示 Tailscale 版本" },
     { cmd: "bugreport", desc: "显示可共享的标识符以帮助诊断问题" },
     { cmd: "licenses",  desc: "获取开源许可信息" },
+    { cmd: "systray",   desc: "运行 Linux 桌面客户端的系统托盘应用" },
   ]},
 ];
 
